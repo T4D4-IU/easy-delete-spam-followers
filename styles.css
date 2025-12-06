@@ -1,0 +1,42 @@
+.follower-manager-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.follower-manager-btn {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.follower-manager-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.remove-btn {
+  background-color: #1d9bf0;
+  color: white;
+  border-color: #1d9bf0;
+}
+
+.remove-btn:hover:not(:disabled) {
+  background-color: #1a8cd8;
+}
+
+.block-btn {
+  background-color: #f4212e;
+  color: white;
+  border-color: #f4212e;
+}
+
+.block-btn:hover:not(:disabled) {
+  background-color: #d31c27;
+}

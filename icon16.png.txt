@@ -1,0 +1,15 @@
+アイコンファイル (icon16.png, icon48.png, icon128.png) は
+以下のようなツールで作成できます：
+
+1. オンラインツール:
+   - https://favicon.io/
+   - https://www.favicon-generator.org/
+
+2. 画像編集ソフト:
+   - GIMP (無料)
+   - Photoshop
+   - Canva
+
+簡単な方法として、任意の画像をリサイズして
+icon16.png, icon48.png, icon128.png という名前で
+このフォルダに保存してください。

@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Twitter Follower Manager",
+  "version": "1.0.0",
+  "description": "フォロワー欄からフォロワーを解除またはブロックできる拡張機能",
+  "permissions": [
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://twitter.com/*",
+    "https://x.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://twitter.com/*/followers",
+        "https://twitter.com/*/verified_followers",
+        "https://x.com/*/followers",
+        "https://x.com/*/verified_followers"
+      ],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
