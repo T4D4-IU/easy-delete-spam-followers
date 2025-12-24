@@ -1,4 +1,4 @@
-# Twitter Follower Manager
+# easy-delete-span-followers
 
 X (旧Twitter) のフォロワー欄から直接フォロワーを解除またはブロックできるChrome拡張機能です。
 
