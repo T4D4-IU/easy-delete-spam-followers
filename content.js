@@ -86,8 +86,8 @@ async function blockUser(userId) {
   }
 }
 
-// ユーザーIDを取得する関数
-function getUserIdFromCell(cell) {
+// ユーザー情報を取得する関数（ユーザー名とID）
+function getUserInfoFromCell(cell) {
   // data-testid="UserCell" の要素からユーザー情報を取得
   const links = cell.querySelectorAll('a[href*="/"]');
   for (let link of links) {
@@ -95,42 +95,33 @@ function getUserIdFromCell(cell) {
     if (href && href.match(/^\/[^\/]+$/)) {
       // プロフィールリンクからユーザー名を取得
       const username = href.substring(1);
-      return username;
+      
+      // リンク要素からdata-*属性でユーザーIDを探す
+      let userId = null;
+      
+      // 親要素を遡ってユーザーIDを探す
+      let parent = cell;
+      while (parent && !userId) {
+        // data-testid="UserCell"内のすべての要素をチェック
+        const allElements = parent.querySelectorAll('[data-testid], [href]');
+        for (let elem of allElements) {
+          const dataAttrs = Array.from(elem.attributes).filter(attr => attr.name.startsWith('data-'));
+          for (let attr of dataAttrs) {
+            // 数値のみで構成されるdata属性値を探す（ユーザーIDの可能性）
+            if (/^\d{10,}$/.test(attr.value)) {
+              userId = attr.value;
+              break;
+            }
+          }
+          if (userId) break;
+        }
+        parent = parent.parentElement;
+      }
+      
+      return { username, userId };
     }
   }
-  return null;
-}
-
-// GraphQL APIでユーザーIDを取得
-async function getUserIdByUsername(username) {
-  const csrfToken = getCsrfToken();
-  if (!csrfToken) return null;
-
-  try {
-    const variables = { screen_name: username, withSafetyModeUserFields: true };
-    const features = { hidden_profile_likes_enabled: true, responsive_web_graphql_exclude_directive_enabled: true, verified_phone_label_enabled: false, subscriptions_verification_info_verified_since_enabled: true, highlights_tweets_tab_ui_enabled: true };
-    
-    const url = `${window.location.origin}/i/api/graphql/G3KGOASz96M-Qu0nwmGXNg/UserByScreenName?variables=${encodeURIComponent(JSON.stringify(variables))}&features=${encodeURIComponent(JSON.stringify(features))}`;
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
-        'x-csrf-token': csrfToken,
-        'x-twitter-auth-type': 'OAuth2Session',
-        'x-twitter-active-user': 'yes'
-      },
-      credentials: 'include'
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      return data?.data?.user?.result?.rest_id;
-    }
-  } catch (error) {
-    console.error('ユーザーID取得エラー:', error);
-  }
-  return null;
+  return { username: null, userId: null };
 }
 
 // ボタンを追加する関数
@@ -140,7 +131,7 @@ function addButtons(cell) {
     return;
   }
 
-  const username = getUserIdFromCell(cell);
+  const { username, userId } = getUserInfoFromCell(cell);
   if (!username) return;
 
   // ボタンコンテナを作成
@@ -160,18 +151,21 @@ function addButtons(cell) {
     removeBtn.disabled = true;
     removeBtn.textContent = '処理中...';
     
-    const userId = await getUserIdByUsername(username);
-    if (userId) {
-      const success = await removeFollower(userId);
-      if (success) {
-        cell.style.opacity = '0.5';
-        removeBtn.textContent = '解除済み';
-      } else {
-        removeBtn.textContent = '失敗';
-        removeBtn.disabled = false;
-      }
+    // userIdがない場合はプロフィールページから取得を試みる
+    let targetUserId = userId;
+    if (!targetUserId) {
+      removeBtn.textContent = 'ID取得不可';
+      removeBtn.disabled = false;
+      alert('ユーザーIDを取得できませんでした。ページを再読み込みしてください。');
+      return;
+    }
+    
+    const success = await removeFollower(targetUserId);
+    if (success) {
+      cell.style.opacity = '0.5';
+      removeBtn.textContent = '解除済み';
     } else {
-      removeBtn.textContent = 'エラー';
+      removeBtn.textContent = '失敗';
       removeBtn.disabled = false;
     }
   };
@@ -189,18 +183,21 @@ function addButtons(cell) {
     blockBtn.disabled = true;
     blockBtn.textContent = '処理中...';
     
-    const userId = await getUserIdByUsername(username);
-    if (userId) {
-      const success = await blockUser(userId);
-      if (success) {
-        cell.style.opacity = '0.5';
-        blockBtn.textContent = 'ブロック済み';
-      } else {
-        blockBtn.textContent = '失敗';
-        blockBtn.disabled = false;
-      }
+    // userIdがない場合はエラー
+    let targetUserId = userId;
+    if (!targetUserId) {
+      blockBtn.textContent = 'ID取得不可';
+      blockBtn.disabled = false;
+      alert('ユーザーIDを取得できませんでした。ページを再読み込みしてください。');
+      return;
+    }
+    
+    const success = await blockUser(targetUserId);
+    if (success) {
+      cell.style.opacity = '0.5';
+      blockBtn.textContent = 'ブロック済み';
     } else {
-      blockBtn.textContent = 'エラー';
+      blockBtn.textContent = '失敗';
       blockBtn.disabled = false;
     }
   };
