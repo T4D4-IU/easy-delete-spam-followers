@@ -90,38 +90,47 @@ async function blockUser(userId) {
 function getUserInfoFromCell(cell) {
   // data-testid="UserCell" の要素からユーザー情報を取得
   const links = cell.querySelectorAll('a[href*="/"]');
+  let username = null;
+  
   for (let link of links) {
     const href = link.getAttribute('href');
     if (href && href.match(/^\/[^\/]+$/)) {
       // プロフィールリンクからユーザー名を取得
-      const username = href.substring(1);
-      
-      // リンク要素からdata-*属性でユーザーIDを探す
-      let userId = null;
-      
-      // 親要素を遡ってユーザーIDを探す
-      let parent = cell;
-      while (parent && !userId) {
-        // data-testid="UserCell"内のすべての要素をチェック
-        const allElements = parent.querySelectorAll('[data-testid], [href]');
-        for (let elem of allElements) {
-          const dataAttrs = Array.from(elem.attributes).filter(attr => attr.name.startsWith('data-'));
-          for (let attr of dataAttrs) {
-            // 数値のみで構成されるdata属性値を探す（ユーザーIDの可能性）
-            if (/^\d{10,}$/.test(attr.value)) {
-              userId = attr.value;
-              break;
-            }
-          }
-          if (userId) break;
-        }
-        parent = parent.parentElement;
-      }
-      
-      return { username, userId };
+      username = href.substring(1);
+      break;
     }
   }
-  return { username: null, userId: null };
+  
+  if (!username) {
+    return { username: null, userId: null };
+  }
+  
+  // フォローボタンのdata-testidからユーザーIDを取得
+  // data-testid="[userId]-follow" の形式
+  const followButton = cell.querySelector('[data-testid$="-follow"]');
+  let userId = null;
+  
+  if (followButton) {
+    const testId = followButton.getAttribute('data-testid');
+    const match = testId.match(/^(\d+)-follow$/);
+    if (match) {
+      userId = match[1];
+    }
+  }
+  
+  // フォローボタンがない場合は他のボタンも確認
+  if (!userId) {
+    const unfollowButton = cell.querySelector('[data-testid$="-unfollow"]');
+    if (unfollowButton) {
+      const testId = unfollowButton.getAttribute('data-testid');
+      const match = testId.match(/^(\d+)-unfollow$/);
+      if (match) {
+        userId = match[1];
+      }
+    }
+  }
+  
+  return { username, userId };
 }
 
 // ボタンを追加する関数
