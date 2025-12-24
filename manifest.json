@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Twitter Follower Manager",
   "version": "1.0.0",
-  "description": "フォロワー欄からフォロワーを解除またはブロックできる拡張機能",
+  "description": "easy-delete-spam-followers",
   "permissions": [
     "activeTab"
   ],
