@@ -21,7 +21,7 @@ async function removeFollower(userId) {
   }
 
   try {
-    const response = await fetch(`https://api.twitter.com/1.1/blocks/create.json`, {
+    const response = await fetch(`${window.location.origin}/i/api/1.1/blocks/create.json`, {
       method: 'POST',
       headers: {
         'authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
@@ -36,7 +36,7 @@ async function removeFollower(userId) {
 
     if (response.ok) {
       // ブロック後すぐにブロック解除してフォロワー解除を実現
-      await fetch(`https://api.twitter.com/1.1/blocks/destroy.json`, {
+      await fetch(`${window.location.origin}/i/api/1.1/blocks/destroy.json`, {
         method: 'POST',
         headers: {
           'authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
@@ -66,7 +66,7 @@ async function blockUser(userId) {
   }
 
   try {
-    const response = await fetch(`https://api.twitter.com/1.1/blocks/create.json`, {
+    const response = await fetch(`${window.location.origin}/i/api/1.1/blocks/create.json`, {
       method: 'POST',
       headers: {
         'authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
@@ -110,7 +110,7 @@ async function getUserIdByUsername(username) {
     const variables = { screen_name: username, withSafetyModeUserFields: true };
     const features = { hidden_profile_likes_enabled: true, responsive_web_graphql_exclude_directive_enabled: true, verified_phone_label_enabled: false, subscriptions_verification_info_verified_since_enabled: true, highlights_tweets_tab_ui_enabled: true };
     
-    const url = `https://twitter.com/i/api/graphql/G3KGOASz96M-Qu0nwmGXNg/UserByScreenName?variables=${encodeURIComponent(JSON.stringify(variables))}&features=${encodeURIComponent(JSON.stringify(features))}`;
+    const url = `${window.location.origin}/i/api/graphql/G3KGOASz96M-Qu0nwmGXNg/UserByScreenName?variables=${encodeURIComponent(JSON.stringify(variables))}&features=${encodeURIComponent(JSON.stringify(features))}`;
     
     const response = await fetch(url, {
       method: 'GET',
